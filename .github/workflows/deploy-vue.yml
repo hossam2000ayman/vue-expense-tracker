@@ -26,17 +26,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          source: ./
-          destination: ./_site
-      - name: Upload artifact
+          node-version: 18
+      - name: Install Dependencies
+        run: npm install
+      - name: Build Vue Project
+        run: npm run build
+      - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist  # Ensure Vue's built files are uploaded
 
   # Deployment job
   deploy:
@@ -45,6 +48,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
